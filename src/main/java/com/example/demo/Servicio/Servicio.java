@@ -17,10 +17,9 @@ public class Servicio extends VerticalLayout {
     // Propiedades del Servicio
     Button[] arrayBotonesNumber = new Button[10];
     char[] numbers = {'0','1','2','3','4','5','6','7','8','9'};
-    Button[] arrayBotonesOperadores = new Button[5];
-    char[] operadores = {'+','-','*','/','='};
+    Button[] arrayBotonesOperadores = new Button[6];
+    char[] operadores = {'+','-','*','/','=','C'};
     Input input1;  // Para ingresar los números y operadores
-    Input inputResultado; // Para mostrar el resultado
     // Lista para guardar todos los valores seleccionados y luego poder discriminar cada valor, para poder operar siguiendo el orden matemático
     ArrayList<String> valoresElegidos = new ArrayList<String>();
 
@@ -39,7 +38,6 @@ public class Servicio extends VerticalLayout {
         // 1º Creamos los elementos
         view.add(new H1("Calculadora"));
         view.add(input1 = new Input());  // Input para ingresar números y operadores
-        view.add(inputResultado = new Input());  // Input para mostrar el resultado
 
         // 2º Creamos los objetos botón, le añadimos el texto y los añadimos a la ventana
         rellenarArraysBotones();
@@ -63,19 +61,24 @@ public class Servicio extends VerticalLayout {
         for (int i = 0; i < arrayBotonesOperadores.length; i++) {
             Button button = new Button(String.valueOf(operadores[i]));
             button.addClickListener(event -> {
-                if (!event.getSource().getText().equals("=")) {
-                    actualizarInput(event.getSource().getText());
-                    // Guardamos el texto de los botones que han sido seleccionados
-                    valoresElegidos.add(event.getSource().getText());
-                } else if (event.getSource().getText().equals("=")) {
+                String operador = event.getSource().getText();
 
-                    // Aquí llamamos al método que va a recorrer el array de valores elegidos y en base a ellos va a operar y generar un resultado
+                if (operador.equals("C")) {
+                    // Limpiar el campo de entrada
+                    input1.clear();
+                    valoresElegidos.clear();  // Limpiar los valores seleccionados
+                } else if (operador.equals("=")) {
+                    // Realizar la operación y mostrar el resultado
                     int resultado = hacerOperacion();
-                    String resultadoString = "Resultado: " + resultado;
-                    actualizarInputResultado(resultadoString);  // Actualizamos el nuevo input de resultado
+                    actualizarInputResultado(String.valueOf(resultado));  // Actualizamos el input con el resultado
 
-                    // Limpiar los valores después de la operación
+                    // En lugar de limpiar "valoresElegidos", mantenemos el resultado para seguir operando con él
                     valoresElegidos.clear();
+                    valoresElegidos.add(String.valueOf(resultado));  // Agregar el resultado como el primer número para futuras operaciones
+                } else {
+                    // Manejar los operadores y actualizar el input
+                    actualizarInput(operador);
+                    valoresElegidos.add(operador);
                 }
             });
             arrayBotonesOperadores[i] = button;
@@ -86,7 +89,7 @@ public class Servicio extends VerticalLayout {
         // Usamos un VerticalLayout para los números y operadores
         VerticalLayout layoutBotones = new VerticalLayout();
 
-        // Creamos filas para los números con un HorizontalLayout
+        // Creamos las filas para los números con un HorizontalLayout
         HorizontalLayout fila1 = new HorizontalLayout(arrayBotonesNumber[1], arrayBotonesNumber[2], arrayBotonesNumber[3]);
         HorizontalLayout fila2 = new HorizontalLayout(arrayBotonesNumber[4], arrayBotonesNumber[5], arrayBotonesNumber[6]);
         HorizontalLayout fila3 = new HorizontalLayout(arrayBotonesNumber[7], arrayBotonesNumber[8], arrayBotonesNumber[9]);
@@ -95,13 +98,22 @@ public class Servicio extends VerticalLayout {
         // Añadimos las filas de números al layout
         layoutBotones.add(fila1, fila2, fila3, fila4);
 
-        // Creamos el HorizontalLayout para los operadores
-        HorizontalLayout filaOperadores = new HorizontalLayout(arrayBotonesOperadores[0], arrayBotonesOperadores[1], arrayBotonesOperadores[2], arrayBotonesOperadores[3], arrayBotonesOperadores[4]);
+        // Creamos un layout para los botones de operadores
+        HorizontalLayout filaOperadores = new HorizontalLayout(
+                arrayBotonesOperadores[0],  // +
+                arrayBotonesOperadores[1],  // -
+                arrayBotonesOperadores[2],  // *
+                arrayBotonesOperadores[3],  // /
+                arrayBotonesOperadores[4],  // C
+                arrayBotonesOperadores[5]   // =
+        );
+        // Añadimos la fila de operadores debajo de los números
+        layoutBotones.add(filaOperadores);
 
-        // Añadimos los botones a la vista
+        // Añadimos los botones de la calculadora a la vista
         view.add(layoutBotones);
-        view.add(filaOperadores);
     }
+
 
     private void actualizarInput(String textoBoton) {
         StringBuilder calculo = new StringBuilder();
@@ -110,7 +122,7 @@ public class Servicio extends VerticalLayout {
     }
 
     private void actualizarInputResultado(String resultado) {
-        inputResultado.setValue(resultado);  // Actualizamos el input del resultado
+        input1.setValue(resultado);  // Actualizamos el input del resultado
     }
 
     // Calcular el resultado de la operación ingresada en el elemento input
@@ -144,7 +156,7 @@ public class Servicio extends VerticalLayout {
         if (!number2.isEmpty()) {
             resultado = calcularResultado(Integer.parseInt(number1), Integer.parseInt(number2), String.valueOf(operador));
         }
-
+        input1.clear();
         return resultado;
     }
 
