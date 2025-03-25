@@ -18,10 +18,5 @@ public class Controlador {
         servicio.elementosCalculadora(view);
     }
 
-    // Método para manejar la operación que el usuario quiere hacer (debemos pasar el texto del botón que ha sido pulsado)
-    // Si el texto es '=', se realiza la operación, si no. No se devuelve nada
-    public void realizarOperacion(CalculadoraMathView view) {
-
-    }
 
 }
