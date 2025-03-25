@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class Servicio extends VerticalLayout {
 
-    // Patrón Singleton
+    // -Patrón Singleton
     private static Servicio servicio;
 
     // Propiedades del Servicio
